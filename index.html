@@ -10,80 +10,111 @@
       padding: 0;
       height: 100%;
       overflow: hidden;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
       background: #000;
+    }
+
+    * {
+      box-sizing: border-box;
     }
 
     #home {
       position: relative;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
       width: 100%;
       height: 100%;
       overflow: hidden;
+      padding: 24px;
     }
 
     #content {
       position: relative;
       z-index: 3;
-      max-width: 90%;
-      background: rgba(255,255,255,0.18);
-      backdrop-filter: blur(10px);
-      border-radius: 12px;
-      padding: 40px;
-      text-align: center;
+      width: min(680px, 92vw);
+      min-height: 430px;
+      padding: 48px 40px 36px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       color: #fff;
-      box-sizing: border-box;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
     }
 
     #content h1 {
-      font-size: 46px;
-      margin-bottom: 20px;
-      text-shadow: 2px 2px 8px rgba(0,0,0,0.35);
+      margin: 0 0 22px;
+      font-size: 56px;
+      line-height: 1.15;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.28);
     }
 
     #content p {
+      margin: 0;
       font-size: 20px;
-      margin-bottom: 20px;
-      text-shadow: 1px 1px 6px rgba(0,0,0,0.3);
+      line-height: 1.8;
+      text-shadow: 1px 1px 8px rgba(0, 0, 0, 0.25);
     }
 
-    #tips {
-      font-size: 14px;
-      opacity: 0.95;
-      margin-top: 12px;
-      line-height: 1.7;
+    #desc {
+      width: 100%;
+      max-width: 520px;
+      margin: 0 auto 10px;
     }
 
     #dropArea {
-      border: 2px dashed #fff;
-      border-radius: 10px;
-      padding: 30px;
+      width: min(420px, 100%);
+      margin: 24px auto 18px;
+      padding: 30px 24px;
+      border: 2px dashed rgba(255, 255, 255, 0.95);
+      border-radius: 14px;
       text-align: center;
       color: #fff;
-      margin-top: 20px;
-      width: 80%;
-      max-width: 420px;
-      background-color: rgba(255,255,255,0.1);
-      transition: background-color 0.3s, transform 0.3s;
+      font-size: 18px;
+      line-height: 1.8;
+      background-color: rgba(255, 255, 255, 0.08);
+      transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
       cursor: pointer;
       user-select: none;
-      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 120px;
     }
 
     #dropArea.hover {
-      background-color: rgba(255,255,255,0.3);
-      transform: scale(1.05);
+      background-color: rgba(255, 255, 255, 0.24);
+      transform: scale(1.03);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    #tips {
+      width: 100%;
+      max-width: 520px;
+      margin: 0 auto;
+      font-size: 15px;
+      line-height: 1.9;
+      opacity: 0.96;
+      text-align: center;
     }
 
     #message {
-      margin-top: 15px;
-      min-height: 24px;
+      width: 100%;
+      max-width: 520px;
+      min-height: 28px;
+      margin: 14px auto 0;
       font-size: 14px;
+      line-height: 1.7;
       color: #fff;
-      line-height: 1.6;
+      text-align: center;
       word-break: break-word;
     }
 
@@ -93,11 +124,8 @@
 
     #gradientOverlay {
       position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(135deg, rgba(255,0,150,0.25), rgba(0,204,255,0.25));
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255, 0, 150, 0.22), rgba(0, 204, 255, 0.22));
       pointer-events: none;
       z-index: 2;
       animation: gradientAnimation 10s ease infinite;
@@ -132,44 +160,44 @@
       top: 20px;
       right: 20px;
       z-index: 40;
-      background: linear-gradient(45deg, #1e90ff, #00ced1);
       border: none;
-      padding: 12px 30px;
-      border-radius: 30px;
-      font-size: 18px;
+      padding: 12px 28px;
+      border-radius: 999px;
+      font-size: 17px;
       color: #fff;
       cursor: pointer;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.25);
-      transition: transform 0.2s, box-shadow 0.2s;
+      background: linear-gradient(45deg, #1e90ff, #00ced1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
 
     #returnBtn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 6px 10px rgba(0,0,0,0.35);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
     }
 
     #compass {
       position: absolute;
-      bottom: 20px;
       right: 20px;
+      bottom: 20px;
       width: 80px;
       height: 80px;
+      z-index: 41;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       border-radius: 50%;
       border: 3px solid transparent;
       background-image: linear-gradient(135deg, #ff4e50, #f9d423), linear-gradient(#222, #222);
       background-origin: border-box;
       background-clip: padding-box, border-box;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 41;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
     }
 
     .compass-arrow {
       width: 40px;
       height: 40px;
-      filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.8));
+      filter: drop-shadow(2px 2px 3px rgba(0, 0, 0, 0.8));
       transition: transform 0.05s linear;
     }
 
@@ -178,36 +206,36 @@
       left: 20px;
       bottom: 20px;
       z-index: 41;
-      color: #fff;
-      background: rgba(0,0,0,0.45);
-      padding: 10px 14px;
-      border-radius: 8px;
-      font-size: 14px;
-      line-height: 1.6;
       max-width: min(420px, 75vw);
-      box-sizing: border-box;
+      padding: 10px 14px;
+      border-radius: 10px;
+      background: rgba(0, 0, 0, 0.45);
+      color: #fff;
+      font-size: 14px;
+      line-height: 1.7;
+      white-space: pre-line;
     }
 
     #helpButton {
       position: fixed;
-      bottom: 20px;
       right: 120px;
+      bottom: 20px;
       width: 50px;
       height: 50px;
-      border-radius: 50%;
-      background: linear-gradient(45deg, #1e90ff, #00ced1);
+      z-index: 50;
       display: flex;
       align-items: center;
       justify-content: center;
+      border-radius: 50%;
+      background: linear-gradient(45deg, #1e90ff, #00ced1);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
       cursor: pointer;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-      z-index: 50;
-      transition: transform 0.2s, box-shadow 0.2s;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
 
     #helpButton:hover {
       transform: translateY(-3px);
-      box-shadow: 0 6px 10px rgba(0,0,0,0.3);
+      box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3);
     }
 
     #helpButton svg {
@@ -220,17 +248,15 @@
       position: fixed;
       top: 50%;
       left: 50%;
-      width: 420px;
-      max-width: 90%;
-      background: rgba(0,0,0,0.86);
-      color: #fff;
+      width: min(420px, 90vw);
       padding: 30px;
-      border-radius: 10px;
+      border-radius: 12px;
+      background: rgba(0, 0, 0, 0.86);
+      color: #fff;
       z-index: 1000;
       display: none;
       opacity: 0;
       transform: translate(150%, 150%) scale(0.1);
-      box-sizing: border-box;
     }
 
     #helpModal.active {
@@ -268,37 +294,59 @@
       position: absolute;
       top: 10px;
       right: 15px;
-      cursor: pointer;
       font-size: 24px;
+      cursor: pointer;
     }
 
     #helpModal h2 {
-      margin-top: 0;
-      margin-bottom: 15px;
+      margin: 0 0 15px;
       text-align: center;
+      font-size: 28px;
     }
 
     #helpModal p {
-      line-height: 1.7;
+      margin: 0;
       font-size: 16px;
+      line-height: 1.8;
     }
 
     @media (max-width: 768px) {
+      #home {
+        padding: 16px;
+      }
+
       #content {
-        padding: 24px;
+        width: min(94vw, 680px);
+        min-height: auto;
+        padding: 34px 22px 28px;
+        border-radius: 16px;
       }
 
       #content h1 {
-        font-size: 32px;
+        font-size: 34px;
+        margin-bottom: 16px;
       }
 
       #content p {
-        font-size: 16px;
+        font-size: 17px;
+        line-height: 1.7;
       }
 
       #dropArea {
-        width: 90%;
-        padding: 20px;
+        width: 100%;
+        min-height: 105px;
+        padding: 24px 18px;
+        font-size: 17px;
+        margin: 22px auto 16px;
+      }
+
+      #tips {
+        font-size: 14px;
+        line-height: 1.8;
+      }
+
+      #message {
+        font-size: 13px;
       }
 
       #returnBtn {
@@ -309,10 +357,10 @@
       }
 
       #compass {
-        width: 64px;
-        height: 64px;
         right: 12px;
         bottom: 12px;
+        width: 64px;
+        height: 64px;
       }
 
       .compass-arrow {
@@ -328,9 +376,22 @@
       }
 
       #helpButton {
-        right: 90px;
+        right: 88px;
+        bottom: 12px;
         width: 44px;
         height: 44px;
+      }
+
+      #helpModal {
+        padding: 24px 20px;
+      }
+
+      #helpModal h2 {
+        font-size: 22px;
+      }
+
+      #helpModal p {
+        font-size: 15px;
       }
     }
   </style>
@@ -339,14 +400,18 @@
   <div id="home">
     <div id="content">
       <h1>全景照片浏览器</h1>
-      <p>选择一张全景照片开始您的沉浸式体验</p>
+      <p id="desc">选择一张全景照片开始您的沉浸式体验</p>
+
       <div id="dropArea">拖拽图片到此处 或 点击上传</div>
+
       <div id="tips">
         建议上传 JPG / PNG / WebP 格式图片；<br>
         最佳效果推荐使用宽高比接近 2:1 的标准全景图。
       </div>
+
       <div id="message"></div>
     </div>
+
     <input type="file" id="fileInput" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
     <div id="gradientOverlay"></div>
   </div>
@@ -360,12 +425,12 @@
         <svg width="40" height="40" viewBox="0 0 100 100">
           <defs>
             <linearGradient id="needleGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#ff4e50"/>
-              <stop offset="100%" stop-color="#f9d423"/>
+              <stop offset="0%" stop-color="#ff4e50"></stop>
+              <stop offset="100%" stop-color="#f9d423"></stop>
             </linearGradient>
           </defs>
-          <polygon points="50,10 40,50 50,45 60,50" fill="url(#needleGradient)" stroke="#fff" stroke-width="2"/>
-          <circle cx="50" cy="50" r="3" fill="#fff"/>
+          <polygon points="50,10 40,50 50,45 60,50" fill="url(#needleGradient)" stroke="#fff" stroke-width="2"></polygon>
+          <circle cx="50" cy="50" r="3" fill="#fff"></circle>
         </svg>
       </div>
     </div>
@@ -373,9 +438,9 @@
     <div id="viewerInfo"></div>
   </div>
 
-  <div id="helpButton">
+  <div id="helpButton" title="使用说明">
     <svg viewBox="0 0 24 24">
-      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm1.07-7.75l-.9.92C12.45 12.9 12 13.5 12 15h-2v-.5c0-1 .45-1.95 1.17-2.65l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.67-.93 2.25z"/>
+      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm1.07-7.75l-.9.92C12.45 12.9 12 13.5 12 15h-2v-.5c0-1 .45-1.95 1.17-2.65l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.67-.93 2.25z"></path>
     </svg>
   </div>
 
@@ -500,10 +565,10 @@
       threeContainerEl.removeEventListener("mousemove", onPointerMove);
       threeContainerEl.removeEventListener("mouseup", onPointerUp);
       threeContainerEl.removeEventListener("mouseleave", onPointerUp);
-      threeContainerEl.removeEventListener("wheel", onMouseWheel, { passive: false });
+      threeContainerEl.removeEventListener("wheel", onMouseWheel);
 
-      threeContainerEl.removeEventListener("touchstart", onTouchStart, { passive: false });
-      threeContainerEl.removeEventListener("touchmove", onTouchMove, { passive: false });
+      threeContainerEl.removeEventListener("touchstart", onTouchStart);
+      threeContainerEl.removeEventListener("touchmove", onTouchMove);
       threeContainerEl.removeEventListener("touchend", onTouchEnd);
 
       if (sphereMesh) {
