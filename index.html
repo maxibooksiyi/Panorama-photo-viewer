@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <title>全景照片浏览器</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css">
   <style>
     html, body {
       margin: 0;
@@ -12,6 +11,7 @@
       height: 100%;
       overflow: hidden;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #000;
     }
 
     #home {
@@ -29,18 +29,19 @@
       position: relative;
       z-index: 3;
       max-width: 90%;
-      background: rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.18);
       backdrop-filter: blur(10px);
-      border-radius: 10px;
+      border-radius: 12px;
       padding: 40px;
       text-align: center;
       color: #fff;
+      box-sizing: border-box;
     }
 
     #content h1 {
-      font-size: 48px;
+      font-size: 46px;
       margin-bottom: 20px;
-      text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+      text-shadow: 2px 2px 8px rgba(0,0,0,0.35);
     }
 
     #content p {
@@ -51,29 +52,39 @@
 
     #tips {
       font-size: 14px;
-      opacity: 0.9;
-      margin-top: 10px;
-      line-height: 1.6;
+      opacity: 0.95;
+      margin-top: 12px;
+      line-height: 1.7;
     }
 
-    .upload-label,
-    #returnBtn {
-      background: linear-gradient(45deg, #1e90ff, #00ced1);
-      border: none;
-      padding: 12px 30px;
-      border-radius: 30px;
-      font-size: 18px;
+    #dropArea {
+      border: 2px dashed #fff;
+      border-radius: 10px;
+      padding: 30px;
+      text-align: center;
       color: #fff;
+      margin-top: 20px;
+      width: 80%;
+      max-width: 420px;
+      background-color: rgba(255,255,255,0.1);
+      transition: background-color 0.3s, transform 0.3s;
       cursor: pointer;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-      transition: transform 0.2s, box-shadow 0.2s;
-      text-decoration: none;
+      user-select: none;
+      box-sizing: border-box;
     }
 
-    .upload-label:hover,
-    #returnBtn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 6px 10px rgba(0,0,0,0.3);
+    #dropArea.hover {
+      background-color: rgba(255,255,255,0.3);
+      transform: scale(1.05);
+    }
+
+    #message {
+      margin-top: 15px;
+      min-height: 24px;
+      font-size: 14px;
+      color: #fff;
+      line-height: 1.6;
+      word-break: break-word;
     }
 
     input[type="file"] {
@@ -86,7 +97,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: linear-gradient(135deg, rgba(255,0,150,0.3), rgba(0,204,255,0.3));
+      background: linear-gradient(135deg, rgba(255,0,150,0.25), rgba(0,204,255,0.25));
       pointer-events: none;
       z-index: 2;
       animation: gradientAnimation 10s ease infinite;
@@ -98,25 +109,43 @@
     }
 
     #viewer {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      z-index: 4;
+      position: fixed;
+      inset: 0;
       display: none;
-      top: 0;
-      left: 0;
+      background: #000;
+      z-index: 20;
     }
 
-    #panorama {
+    #threeContainer {
       width: 100%;
       height: 100%;
+      touch-action: none;
+      cursor: grab;
+    }
+
+    #threeContainer.dragging {
+      cursor: grabbing;
     }
 
     #returnBtn {
       position: absolute;
       top: 20px;
       right: 20px;
-      z-index: 6;
+      z-index: 40;
+      background: linear-gradient(45deg, #1e90ff, #00ced1);
+      border: none;
+      padding: 12px 30px;
+      border-radius: 30px;
+      font-size: 18px;
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.25);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    #returnBtn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 10px rgba(0,0,0,0.35);
     }
 
     #compass {
@@ -134,14 +163,29 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      z-index: 6;
+      z-index: 41;
     }
 
     .compass-arrow {
       width: 40px;
       height: 40px;
       filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.8));
-      transition: transform 0.1s linear;
+      transition: transform 0.05s linear;
+    }
+
+    #viewerInfo {
+      position: absolute;
+      left: 20px;
+      bottom: 20px;
+      z-index: 41;
+      color: #fff;
+      background: rgba(0,0,0,0.45);
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 14px;
+      line-height: 1.6;
+      max-width: min(420px, 75vw);
+      box-sizing: border-box;
     }
 
     #helpButton {
@@ -157,7 +201,7 @@
       justify-content: center;
       cursor: pointer;
       box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-      z-index: 7;
+      z-index: 50;
       transition: transform 0.2s, box-shadow 0.2s;
     }
 
@@ -176,9 +220,9 @@
       position: fixed;
       top: 50%;
       left: 50%;
-      width: 400px;
+      width: 420px;
       max-width: 90%;
-      background: rgba(0,0,0,0.85);
+      background: rgba(0,0,0,0.86);
       color: #fff;
       padding: 30px;
       border-radius: 10px;
@@ -239,35 +283,6 @@
       font-size: 16px;
     }
 
-    #dropArea {
-      border: 2px dashed #fff;
-      border-radius: 10px;
-      padding: 30px;
-      text-align: center;
-      color: #fff;
-      margin-top: 20px;
-      width: 80%;
-      max-width: 400px;
-      background-color: rgba(255,255,255,0.1);
-      transition: background-color 0.3s, transform 0.3s;
-      cursor: pointer;
-      user-select: none;
-    }
-
-    #dropArea.hover {
-      background-color: rgba(255,255,255,0.3);
-      transform: scale(1.05);
-    }
-
-    #message {
-      margin-top: 15px;
-      font-size: 14px;
-      color: #fff;
-      min-height: 24px;
-      line-height: 1.6;
-      word-break: break-word;
-    }
-
     @media (max-width: 768px) {
       #content {
         padding: 24px;
@@ -284,12 +299,6 @@
       #dropArea {
         width: 90%;
         padding: 20px;
-      }
-
-      #helpButton {
-        right: 90px;
-        width: 44px;
-        height: 44px;
       }
 
       #returnBtn {
@@ -310,6 +319,19 @@
         width: 32px;
         height: 32px;
       }
+
+      #viewerInfo {
+        left: 12px;
+        bottom: 12px;
+        max-width: calc(100vw - 24px);
+        font-size: 12px;
+      }
+
+      #helpButton {
+        right: 90px;
+        width: 44px;
+        height: 44px;
+      }
     }
   </style>
 </head>
@@ -321,7 +343,7 @@
       <div id="dropArea">拖拽图片到此处 或 点击上传</div>
       <div id="tips">
         建议上传 JPG / PNG / WebP 格式图片；<br>
-        标准全景图推荐宽高比接近 2:1，例如 4096×2048。
+        最佳效果推荐使用宽高比接近 2:1 的标准全景图。
       </div>
       <div id="message"></div>
     </div>
@@ -331,7 +353,8 @@
 
   <div id="viewer">
     <button id="returnBtn">返回首页</button>
-    <div id="panorama"></div>
+    <div id="threeContainer"></div>
+
     <div id="compass">
       <div class="compass-arrow">
         <svg width="40" height="40" viewBox="0 0 100 100">
@@ -346,9 +369,11 @@
         </svg>
       </div>
     </div>
+
+    <div id="viewerInfo"></div>
   </div>
 
-  <div id="helpButton" title="使用说明">
+  <div id="helpButton">
     <svg viewBox="0 0 24 24">
       <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm1.07-7.75l-.9.92C12.45 12.9 12 13.5 12 15h-2v-.5c0-1 .45-1.95 1.17-2.65l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.67-.93 2.25z"/>
     </svg>
@@ -358,33 +383,52 @@
     <span id="helpClose">&times;</span>
     <h2>使用说明</h2>
     <p>
-      1. 点击主页拖拽区域或直接拖入图片，选择并上传一张全景照片。<br><br>
-      2. 照片上传后，系统会自动进入全景浏览模式，您可以通过鼠标拖动或触摸手势旋转全景图。<br><br>
-      3. 使用鼠标滚轮或双指捏合进行缩放，查看全景细节。<br><br>
-      4. 右下角指南针会随当前视角方向实时旋转。<br><br>
-      5. 点击右上角“返回首页”按钮可退出浏览模式，系统会自动释放资源。<br><br>
-      6. 建议使用标准 2:1 的 equirectangular 全景图，以获得最佳显示效果。<br><br>
-      7. 若图片无法打开，请优先检查格式是否为 JPG / PNG / WebP。
+      1. 点击上传区域或直接拖拽图片到页面中。<br><br>
+      2. 上传成功后，可通过鼠标拖动或手指滑动旋转视角。<br><br>
+      3. 使用鼠标滚轮或双指缩放可调整视野。<br><br>
+      4. 右下角指南针会跟随当前视角转动。<br><br>
+      5. 点击右上角“返回首页”可退出浏览模式。<br><br>
+      6. 推荐使用标准 2:1 equirectangular 全景图，以获得最佳效果。<br><br>
+      7. 如果图片无法正常显示，请优先检查格式是否为 JPG / PNG / WebP。
     </p>
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.21/vanta.waves.min.js"></script>
-  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
 
   <script>
     let vantaEffect = null;
-    let myViewer = null;
-    let compassAnimationId = null;
-    let displayedAngle = 0;
+
+    let scene = null;
+    let camera = null;
+    let renderer = null;
+    let sphereMesh = null;
+    let texture = null;
+    let animationId = null;
+
+    let lon = 0;
+    let lat = 0;
+    let phi = 0;
+    let theta = 0;
+
+    let isUserInteracting = false;
+    let pointerDownX = 0;
+    let pointerDownY = 0;
+    let pointerDownLon = 0;
+    let pointerDownLat = 0;
+
     let currentImageUrl = null;
+    let currentImageName = "";
+    let currentImageWidth = 0;
+    let currentImageHeight = 0;
 
     const homeEl = document.getElementById("home");
     const viewerEl = document.getElementById("viewer");
-    const panoramaEl = document.getElementById("panorama");
     const fileInputEl = document.getElementById("fileInput");
     const dropAreaEl = document.getElementById("dropArea");
     const messageEl = document.getElementById("message");
+    const viewerInfoEl = document.getElementById("viewerInfo");
+    const threeContainerEl = document.getElementById("threeContainer");
     const compassArrowEl = document.querySelector(".compass-arrow");
     const helpModalEl = document.getElementById("helpModal");
 
@@ -412,52 +456,87 @@
       }
     }
 
-    function mod(n, m) {
-      return ((n % m) + m) % m;
-    }
-
-    function updateCompass() {
-      if (myViewer && typeof myViewer.getYaw === "function") {
-        const targetAngle = myViewer.getYaw() || 0;
-        const diff = mod((targetAngle - displayedAngle + 180), 360) - 180;
-        displayedAngle += diff;
-        compassArrowEl.style.transform = "rotate(" + (-displayedAngle) + "deg)";
-      }
-      compassAnimationId = requestAnimationFrame(updateCompass);
-    }
-
-    function stopCompass() {
-      if (compassAnimationId) {
-        cancelAnimationFrame(compassAnimationId);
-        compassAnimationId = null;
-      }
-    }
-
     function setMessage(text, isError = false) {
       messageEl.textContent = text || "";
       messageEl.style.color = isError ? "#ffd2d2" : "#ffffff";
     }
 
-    function cleanupViewer() {
-      stopCompass();
+    function setViewerInfo(text) {
+      viewerInfoEl.textContent = text || "";
+    }
 
-      if (myViewer && typeof myViewer.destroy === "function") {
-        try {
-          myViewer.destroy();
-        } catch (e) {
-          console.warn("销毁 viewer 时出现问题：", e);
-        }
+    function validateFile(file) {
+      if (!file) {
+        setMessage("未选择文件。", true);
+        return false;
       }
-      myViewer = null;
+
+      const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+      const fileName = (file.name || "").toLowerCase();
+      const hasAllowedExt = /\.(jpg|jpeg|png|webp)$/.test(fileName);
+      const hasAllowedType = allowedTypes.includes(file.type);
+
+      if (!hasAllowedExt && !hasAllowedType) {
+        setMessage("请上传 JPG、PNG 或 WebP 格式图片。", true);
+        return false;
+      }
+
+      if (file.size > 100 * 1024 * 1024) {
+        setMessage("图片过大，请尽量选择 100MB 以内的图片。", true);
+        return false;
+      }
+
+      return true;
+    }
+
+    function destroyViewer() {
+      if (animationId) {
+        cancelAnimationFrame(animationId);
+        animationId = null;
+      }
+
+      window.removeEventListener("resize", onWindowResize);
+      threeContainerEl.removeEventListener("mousedown", onPointerStart);
+      threeContainerEl.removeEventListener("mousemove", onPointerMove);
+      threeContainerEl.removeEventListener("mouseup", onPointerUp);
+      threeContainerEl.removeEventListener("mouseleave", onPointerUp);
+      threeContainerEl.removeEventListener("wheel", onMouseWheel, { passive: false });
+
+      threeContainerEl.removeEventListener("touchstart", onTouchStart, { passive: false });
+      threeContainerEl.removeEventListener("touchmove", onTouchMove, { passive: false });
+      threeContainerEl.removeEventListener("touchend", onTouchEnd);
+
+      if (sphereMesh) {
+        if (sphereMesh.geometry) sphereMesh.geometry.dispose();
+        if (sphereMesh.material) sphereMesh.material.dispose();
+        sphereMesh = null;
+      }
+
+      if (texture) {
+        texture.dispose();
+        texture = null;
+      }
+
+      if (renderer) {
+        renderer.dispose();
+        if (renderer.domElement && renderer.domElement.parentNode) {
+          renderer.domElement.parentNode.removeChild(renderer.domElement);
+        }
+        renderer = null;
+      }
+
+      scene = null;
+      camera = null;
 
       if (currentImageUrl) {
         URL.revokeObjectURL(currentImageUrl);
         currentImageUrl = null;
       }
 
-      panoramaEl.innerHTML = "";
-      displayedAngle = 0;
+      threeContainerEl.classList.remove("dragging");
+      threeContainerEl.innerHTML = "";
       compassArrowEl.style.transform = "rotate(0deg)";
+      setViewerInfo("");
     }
 
     function showHome() {
@@ -473,28 +552,140 @@
       viewerEl.style.display = "block";
     }
 
-    function validateFile(file) {
-      if (!file) {
-        setMessage("未选择文件。", true);
-        return false;
+    function initPanoramaViewer(imageElement) {
+      destroyViewer();
+      showViewer();
+
+      scene = new THREE.Scene();
+
+      const width = threeContainerEl.clientWidth || window.innerWidth;
+      const height = threeContainerEl.clientHeight || window.innerHeight;
+
+      camera = new THREE.PerspectiveCamera(75, width / height, 1, 1100);
+      camera.target = new THREE.Vector3(0, 0, 0);
+
+      renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.setSize(width, height);
+      threeContainerEl.appendChild(renderer.domElement);
+
+      texture = new THREE.Texture(imageElement);
+      texture.needsUpdate = true;
+      texture.minFilter = THREE.LinearFilter;
+
+      const geometry = new THREE.SphereBufferGeometry(500, 60, 40);
+      geometry.scale(-1, 1, 1);
+
+      const material = new THREE.MeshBasicMaterial({ map: texture });
+      sphereMesh = new THREE.Mesh(geometry, material);
+      scene.add(sphereMesh);
+
+      lon = 0;
+      lat = 0;
+
+      bindViewerEvents();
+      animate();
+    }
+
+    function bindViewerEvents() {
+      window.addEventListener("resize", onWindowResize);
+
+      threeContainerEl.addEventListener("mousedown", onPointerStart);
+      threeContainerEl.addEventListener("mousemove", onPointerMove);
+      threeContainerEl.addEventListener("mouseup", onPointerUp);
+      threeContainerEl.addEventListener("mouseleave", onPointerUp);
+      threeContainerEl.addEventListener("wheel", onMouseWheel, { passive: false });
+
+      threeContainerEl.addEventListener("touchstart", onTouchStart, { passive: false });
+      threeContainerEl.addEventListener("touchmove", onTouchMove, { passive: false });
+      threeContainerEl.addEventListener("touchend", onTouchEnd);
+    }
+
+    function onWindowResize() {
+      if (!camera || !renderer) return;
+      const width = threeContainerEl.clientWidth || window.innerWidth;
+      const height = threeContainerEl.clientHeight || window.innerHeight;
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+      renderer.setSize(width, height);
+    }
+
+    function onPointerStart(event) {
+      isUserInteracting = true;
+      threeContainerEl.classList.add("dragging");
+      pointerDownX = event.clientX;
+      pointerDownY = event.clientY;
+      pointerDownLon = lon;
+      pointerDownLat = lat;
+    }
+
+    function onPointerMove(event) {
+      if (!isUserInteracting) return;
+      lon = (pointerDownX - event.clientX) * 0.12 + pointerDownLon;
+      lat = (event.clientY - pointerDownY) * 0.12 + pointerDownLat;
+    }
+
+    function onPointerUp() {
+      isUserInteracting = false;
+      threeContainerEl.classList.remove("dragging");
+    }
+
+    function onTouchStart(event) {
+      if (event.touches.length === 1) {
+        event.preventDefault();
+        isUserInteracting = true;
+        pointerDownX = event.touches[0].clientX;
+        pointerDownY = event.touches[0].clientY;
+        pointerDownLon = lon;
+        pointerDownLat = lat;
       }
+    }
 
-      const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
-      const fileName = (file.name || "").toLowerCase();
-      const hasAllowedExt = /\.(jpg|jpeg|png|webp)$/.test(fileName);
-      const hasAllowedType = allowedTypes.includes(file.type);
-
-      if (!hasAllowedType && !hasAllowedExt) {
-        setMessage("请上传 JPG、PNG 或 WebP 格式图片。", true);
-        return false;
+    function onTouchMove(event) {
+      if (event.touches.length === 1 && isUserInteracting) {
+        event.preventDefault();
+        lon = (pointerDownX - event.touches[0].clientX) * 0.12 + pointerDownLon;
+        lat = (event.touches[0].clientY - pointerDownY) * 0.12 + pointerDownLat;
       }
+    }
 
-      if (file.size > 100 * 1024 * 1024) {
-        setMessage("图片过大，请尽量选择 100MB 以内的图片。", true);
-        return false;
-      }
+    function onTouchEnd() {
+      isUserInteracting = false;
+    }
 
-      return true;
+    function onMouseWheel(event) {
+      if (!camera) return;
+      event.preventDefault();
+      camera.fov += event.deltaY * 0.03;
+      camera.fov = Math.max(30, Math.min(100, camera.fov));
+      camera.updateProjectionMatrix();
+    }
+
+    function updateCompass() {
+      const yaw = ((lon % 360) + 360) % 360;
+      compassArrowEl.style.transform = "rotate(" + (-yaw) + "deg)";
+    }
+
+    function animate() {
+      animationId = requestAnimationFrame(animate);
+      render();
+    }
+
+    function render() {
+      if (!camera || !renderer) return;
+
+      lat = Math.max(-85, Math.min(85, lat));
+      phi = THREE.Math.degToRad(90 - lat);
+      theta = THREE.Math.degToRad(lon);
+
+      camera.target.x = 500 * Math.sin(phi) * Math.cos(theta);
+      camera.target.y = 500 * Math.cos(phi);
+      camera.target.z = 500 * Math.sin(phi) * Math.sin(theta);
+
+      camera.lookAt(camera.target);
+      renderer.render(scene, camera);
+
+      updateCompass();
     }
 
     function handleFile(file) {
@@ -502,57 +693,34 @@
 
       if (!validateFile(file)) return;
 
-      const testUrl = URL.createObjectURL(file);
+      const objectUrl = URL.createObjectURL(file);
       const img = new Image();
 
-      img.onload = function () {
-        const width = img.naturalWidth || img.width;
-        const height = img.naturalHeight || img.height;
-        const ratio = width / height;
+      img.onload = function() {
+        currentImageUrl = objectUrl;
+        currentImageName = file.name || "未命名图片";
+        currentImageWidth = img.naturalWidth || img.width;
+        currentImageHeight = img.naturalHeight || img.height;
 
-        currentImageUrl = testUrl;
+        const ratio = currentImageWidth / currentImageHeight;
+        let info = `文件：${currentImageName}\n尺寸：${currentImageWidth} × ${currentImageHeight}`;
 
-        showViewer();
-        cleanupViewer();
-
-        // cleanupViewer 会把 currentImageUrl 清掉，所以这里重新赋值
-        currentImageUrl = testUrl;
-
-        try {
-          myViewer = pannellum.viewer("panorama", {
-            type: "equirectangular",
-            panorama: currentImageUrl,
-            autoLoad: true,
-            compass: false,
-            driftEnabled: false,
-            showZoomCtrl: true,
-            showFullscreenCtrl: true
-          });
-
-          displayedAngle = 0;
-          updateCompass();
-
-          if (ratio < 1.8 || ratio > 2.2) {
-            setMessage(
-              `提示：图片尺寸为 ${width} × ${height}，宽高比约 ${ratio.toFixed(2)}，可能不是标准 2:1 全景图，显示可能会有拉伸。`
-            );
-          } else {
-            setMessage(`已加载图片：${width} × ${height}`);
-          }
-        } catch (err) {
-          console.error(err);
-          cleanupViewer();
-          showHome();
-          setMessage("全景图加载失败，请尝试更换一张 JPG/PNG/WebP 图片。", true);
+        if (ratio < 1.8 || ratio > 2.2) {
+          info += `\n提示：当前宽高比约 ${ratio.toFixed(2)}，可能不是标准 2:1 全景图，显示可能会有拉伸。`;
+        } else {
+          info += `\n宽高比约 ${ratio.toFixed(2)}，接近标准全景图。`;
         }
+
+        setViewerInfo(info);
+        initPanoramaViewer(img);
       };
 
-      img.onerror = function () {
-        URL.revokeObjectURL(testUrl);
-        setMessage("图片无法被浏览器正常解码，请尝试更换 JPG/PNG/WebP 图片。", true);
+      img.onerror = function() {
+        URL.revokeObjectURL(objectUrl);
+        setMessage("图片无法被浏览器正常解码，请尝试更换 JPG / PNG / WebP 图片。", true);
       };
 
-      img.src = testUrl;
+      img.src = objectUrl;
     }
 
     fileInputEl.addEventListener("change", function(event) {
@@ -581,7 +749,7 @@
     });
 
     document.getElementById("returnBtn").addEventListener("click", function() {
-      cleanupViewer();
+      destroyViewer();
       showHome();
       setMessage("");
     });
@@ -602,7 +770,7 @@
     });
 
     window.addEventListener("beforeunload", function() {
-      cleanupViewer();
+      destroyViewer();
       destroyVanta();
     });
 
