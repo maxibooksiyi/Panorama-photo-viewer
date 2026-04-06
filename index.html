@@ -6,33 +6,311 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css">
   <style>
-    html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-    #home { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; overflow: hidden; }
-    #content { position: relative; z-index: 3; max-width: 90%; background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); border-radius: 10px; padding: 40px; text-align: center; color: #fff; }
-    #content h1 { font-size: 48px; margin-bottom: 20px; text-shadow: 2px 2px 8px rgba(0,0,0,0.3); }
-    #content p { font-size: 20px; margin-bottom: 40px; text-shadow: 1px 1px 6px rgba(0,0,0,0.3); }
-    .upload-label, #returnBtn { background: linear-gradient(45deg, #1e90ff, #00ced1); border: none; padding: 12px 30px; border-radius: 30px; font-size: 18px; color: #fff; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.2); transition: transform 0.2s, box-shadow 0.2s; text-decoration: none; }
-    .upload-label:hover, #returnBtn:hover { transform: translateY(-3px); box-shadow: 0 6px 10px rgba(0,0,0,0.3); }
-    input[type="file"] { display: none; }
-    #gradientOverlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(255,0,150,0.3), rgba(0,204,255,0.3)); pointer-events: none; z-index: 2; animation: gradientAnimation 10s ease infinite; }
-    @keyframes gradientAnimation { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }
-    #viewer { position: absolute; width: 100%; height: 100%; z-index: 4; display: none; }
-    #returnBtn { position: absolute; top: 20px; right: 20px; z-index: 6; }
-    #compass { position: absolute; bottom: 20px; right: 20px; width: 80px; height: 80px; border-radius: 50%; border: 3px solid transparent; background-image: linear-gradient(135deg, #ff4e50, #f9d423), linear-gradient(#222, #222); background-origin: border-box; background-clip: padding-box, border-box; box-shadow: 0 4px 10px rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 6; }
-    .compass-arrow { width: 40px; height: 40px; filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.8)); transition: transform 0.1s linear; }
-    #helpButton { position: fixed; bottom: 20px; right: 120px; width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(45deg, #1e90ff, #00ced1); display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.2); z-index: 7; transition: transform 0.2s, box-shadow 0.2s; }
-    #helpButton:hover { transform: translateY(-3px); box-shadow: 0 6px 10px rgba(0,0,0,0.3); }
-    #helpButton svg { width: 24px; height: 24px; fill: #fff; }
-    #helpModal { position: fixed; top: 50%; left: 50%; width: 400px; max-width: 90%; background: rgba(0,0,0,0.8); color: #fff; padding: 30px; border-radius: 10px; z-index: 1000; display: none; opacity: 0; transform: translate(150%, 150%) scale(0.1); }
-    #helpModal.active { display: block; animation: slideIn 0.5s forwards; }
-    @keyframes slideIn { from { transform: translate(150%, 150%) scale(0.1); opacity: 0; } to { transform: translate(-50%, -50%) scale(1); opacity: 1; } }
-    @keyframes slideOut { from { transform: translate(-50%, -50%) scale(1); opacity: 1; } to { transform: translate(150%, 150%) scale(0.1); opacity: 0; } }
-    #helpModal.closing { animation: slideOut 0.5s forwards; }
-    #helpClose { position: absolute; top: 10px; right: 15px; cursor: pointer; font-size: 24px; }
-    #helpModal h2 { margin-top: 0; margin-bottom: 15px; text-align: center; }
-    #helpModal p { line-height: 1.6; font-size: 16px; }
-    #dropArea { border: 2px dashed #fff; border-radius: 10px; padding: 30px; text-align: center; color: #fff; margin-top: 20px; width: 80%; max-width: 400px; background-color: rgba(255,255,255,0.1); transition: background-color 0.3s, transform 0.3s; cursor: pointer; }
-    #dropArea.hover { background-color: rgba(255,255,255,0.3); transform: scale(1.05); }
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    #home {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    #content {
+      position: relative;
+      z-index: 3;
+      max-width: 90%;
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(10px);
+      border-radius: 10px;
+      padding: 40px;
+      text-align: center;
+      color: #fff;
+    }
+
+    #content h1 {
+      font-size: 48px;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+    }
+
+    #content p {
+      font-size: 20px;
+      margin-bottom: 20px;
+      text-shadow: 1px 1px 6px rgba(0,0,0,0.3);
+    }
+
+    #tips {
+      font-size: 14px;
+      opacity: 0.9;
+      margin-top: 10px;
+      line-height: 1.6;
+    }
+
+    .upload-label,
+    #returnBtn {
+      background: linear-gradient(45deg, #1e90ff, #00ced1);
+      border: none;
+      padding: 12px 30px;
+      border-radius: 30px;
+      font-size: 18px;
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+      transition: transform 0.2s, box-shadow 0.2s;
+      text-decoration: none;
+    }
+
+    .upload-label:hover,
+    #returnBtn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 10px rgba(0,0,0,0.3);
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    #gradientOverlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(255,0,150,0.3), rgba(0,204,255,0.3));
+      pointer-events: none;
+      z-index: 2;
+      animation: gradientAnimation 10s ease infinite;
+    }
+
+    @keyframes gradientAnimation {
+      0% { filter: hue-rotate(0deg); }
+      100% { filter: hue-rotate(360deg); }
+    }
+
+    #viewer {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      z-index: 4;
+      display: none;
+      top: 0;
+      left: 0;
+    }
+
+    #panorama {
+      width: 100%;
+      height: 100%;
+    }
+
+    #returnBtn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 6;
+    }
+
+    #compass {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      border: 3px solid transparent;
+      background-image: linear-gradient(135deg, #ff4e50, #f9d423), linear-gradient(#222, #222);
+      background-origin: border-box;
+      background-clip: padding-box, border-box;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 6;
+    }
+
+    .compass-arrow {
+      width: 40px;
+      height: 40px;
+      filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.8));
+      transition: transform 0.1s linear;
+    }
+
+    #helpButton {
+      position: fixed;
+      bottom: 20px;
+      right: 120px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: linear-gradient(45deg, #1e90ff, #00ced1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+      z-index: 7;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    #helpButton:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 10px rgba(0,0,0,0.3);
+    }
+
+    #helpButton svg {
+      width: 24px;
+      height: 24px;
+      fill: #fff;
+    }
+
+    #helpModal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      width: 400px;
+      max-width: 90%;
+      background: rgba(0,0,0,0.85);
+      color: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      z-index: 1000;
+      display: none;
+      opacity: 0;
+      transform: translate(150%, 150%) scale(0.1);
+      box-sizing: border-box;
+    }
+
+    #helpModal.active {
+      display: block;
+      animation: slideIn 0.5s forwards;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translate(150%, 150%) scale(0.1);
+        opacity: 0;
+      }
+      to {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideOut {
+      from {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+      }
+      to {
+        transform: translate(150%, 150%) scale(0.1);
+        opacity: 0;
+      }
+    }
+
+    #helpModal.closing {
+      animation: slideOut 0.5s forwards;
+    }
+
+    #helpClose {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      cursor: pointer;
+      font-size: 24px;
+    }
+
+    #helpModal h2 {
+      margin-top: 0;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+
+    #helpModal p {
+      line-height: 1.7;
+      font-size: 16px;
+    }
+
+    #dropArea {
+      border: 2px dashed #fff;
+      border-radius: 10px;
+      padding: 30px;
+      text-align: center;
+      color: #fff;
+      margin-top: 20px;
+      width: 80%;
+      max-width: 400px;
+      background-color: rgba(255,255,255,0.1);
+      transition: background-color 0.3s, transform 0.3s;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    #dropArea.hover {
+      background-color: rgba(255,255,255,0.3);
+      transform: scale(1.05);
+    }
+
+    #message {
+      margin-top: 15px;
+      font-size: 14px;
+      color: #fff;
+      min-height: 24px;
+      line-height: 1.6;
+      word-break: break-word;
+    }
+
+    @media (max-width: 768px) {
+      #content {
+        padding: 24px;
+      }
+
+      #content h1 {
+        font-size: 32px;
+      }
+
+      #content p {
+        font-size: 16px;
+      }
+
+      #dropArea {
+        width: 90%;
+        padding: 20px;
+      }
+
+      #helpButton {
+        right: 90px;
+        width: 44px;
+        height: 44px;
+      }
+
+      #returnBtn {
+        top: 12px;
+        right: 12px;
+        padding: 10px 18px;
+        font-size: 14px;
+      }
+
+      #compass {
+        width: 64px;
+        height: 64px;
+        right: 12px;
+        bottom: 12px;
+      }
+
+      .compass-arrow {
+        width: 32px;
+        height: 32px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -41,13 +319,19 @@
       <h1>全景照片浏览器</h1>
       <p>选择一张全景照片开始您的沉浸式体验</p>
       <div id="dropArea">拖拽图片到此处 或 点击上传</div>
+      <div id="tips">
+        建议上传 JPG / PNG / WebP 格式图片；<br>
+        标准全景图推荐宽高比接近 2:1，例如 4096×2048。
+      </div>
+      <div id="message"></div>
     </div>
-    <input type="file" id="fileInput" accept="image/*">
+    <input type="file" id="fileInput" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
     <div id="gradientOverlay"></div>
   </div>
+
   <div id="viewer">
     <button id="returnBtn">返回首页</button>
-    <div id="panorama" style="width: 100%; height: 100%;"></div>
+    <div id="panorama"></div>
     <div id="compass">
       <div class="compass-arrow">
         <svg width="40" height="40" viewBox="0 0 100 100">
@@ -63,84 +347,266 @@
       </div>
     </div>
   </div>
-  <div id="helpButton">
+
+  <div id="helpButton" title="使用说明">
     <svg viewBox="0 0 24 24">
       <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm1.07-7.75l-.9.92C12.45 12.9 12 13.5 12 15h-2v-.5c0-1 .45-1.95 1.17-2.65l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.67-.93 2.25z"/>
     </svg>
   </div>
+
   <div id="helpModal">
     <span id="helpClose">&times;</span>
     <h2>使用说明</h2>
     <p>
-      1. 点击主页上的拖拽区域或直接点击上传图片，选择并上传一张全景照片。<br><br>
+      1. 点击主页拖拽区域或直接拖入图片，选择并上传一张全景照片。<br><br>
       2. 照片上传后，系统会自动进入全景浏览模式，您可以通过鼠标拖动或触摸手势旋转全景图。<br><br>
-      3. 使用鼠标滚轮或双指捏合进行缩放，细致查看全景细节。<br><br>
-      4. 全景界面右下角显示的指南针实时指示当前视角方向，帮助您快速定位。<br><br>
-      5. 如需退出全景浏览模式，可点击右上角的“返回首页”按钮，系统将自动销毁全景资源并返回上传页面。<br><br>
-      6. 本浏览器支持触控设备操作，确保在手机或平板上也有流畅体验。<br><br>
-      7. 如遇操作疑问，请点击右下角问号按钮随时查看本使用说明。
+      3. 使用鼠标滚轮或双指捏合进行缩放，查看全景细节。<br><br>
+      4. 右下角指南针会随当前视角方向实时旋转。<br><br>
+      5. 点击右上角“返回首页”按钮可退出浏览模式，系统会自动释放资源。<br><br>
+      6. 建议使用标准 2:1 的 equirectangular 全景图，以获得最佳显示效果。<br><br>
+      7. 若图片无法打开，请优先检查格式是否为 JPG / PNG / WebP。
     </p>
   </div>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.21/vanta.waves.min.js"></script>
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
+
   <script>
-    let vantaEffect = VANTA.WAVES({ el: "#home", mouseControls: true, touchControls: true, minHeight: 200, minWidth: 200, scale: 1.0, scaleMobile: 1.0, color: 0x1e90ff, waveHeight: 20, shininess: 50 });
+    let vantaEffect = null;
     let myViewer = null;
     let compassAnimationId = null;
     let displayedAngle = 0;
-    function mod(n, m) { return ((n % m) + m) % m; }
+    let currentImageUrl = null;
+
+    const homeEl = document.getElementById("home");
+    const viewerEl = document.getElementById("viewer");
+    const panoramaEl = document.getElementById("panorama");
+    const fileInputEl = document.getElementById("fileInput");
+    const dropAreaEl = document.getElementById("dropArea");
+    const messageEl = document.getElementById("message");
+    const compassArrowEl = document.querySelector(".compass-arrow");
+    const helpModalEl = document.getElementById("helpModal");
+
+    function initVanta() {
+      if (window.VANTA && window.VANTA.WAVES) {
+        vantaEffect = VANTA.WAVES({
+          el: "#home",
+          mouseControls: true,
+          touchControls: true,
+          minHeight: 200,
+          minWidth: 200,
+          scale: 1.0,
+          scaleMobile: 1.0,
+          color: 0x1e90ff,
+          waveHeight: 20,
+          shininess: 50
+        });
+      }
+    }
+
+    function destroyVanta() {
+      if (vantaEffect && typeof vantaEffect.destroy === "function") {
+        vantaEffect.destroy();
+        vantaEffect = null;
+      }
+    }
+
+    function mod(n, m) {
+      return ((n % m) + m) % m;
+    }
+
     function updateCompass() {
-      if(myViewer) {
-        let targetAngle = myViewer.getYaw();
-        let diff = mod((targetAngle - displayedAngle + 180), 360) - 180;
+      if (myViewer && typeof myViewer.getYaw === "function") {
+        const targetAngle = myViewer.getYaw() || 0;
+        const diff = mod((targetAngle - displayedAngle + 180), 360) - 180;
         displayedAngle += diff;
-        document.querySelector('.compass-arrow').style.transform = 'rotate(' + (-displayedAngle) + 'deg)';
+        compassArrowEl.style.transform = "rotate(" + (-displayedAngle) + "deg)";
       }
       compassAnimationId = requestAnimationFrame(updateCompass);
     }
-    function handleFile(file) {
-      let reader = new FileReader();
-      reader.onload = function(e) {
-        let imageData = e.target.result;
-        if (vantaEffect && vantaEffect.destroy) { vantaEffect.destroy(); vantaEffect = null; }
-        document.getElementById("home").style.display = "none";
-        document.getElementById("viewer").style.display = "block";
-        myViewer = pannellum.viewer('panorama', { "type": "equirectangular", "panorama": imageData, "autoLoad": true, "compass": false, "driftEnabled": false });
-        updateCompass();
-      };
-      reader.readAsDataURL(file);
+
+    function stopCompass() {
+      if (compassAnimationId) {
+        cancelAnimationFrame(compassAnimationId);
+        compassAnimationId = null;
+      }
     }
-    document.getElementById("fileInput").addEventListener("change", function(event) {
-      let file = event.target.files[0];
-      if (file) { handleFile(file); }
-    });
-    let dropArea = document.getElementById("dropArea");
-    dropArea.addEventListener("dragover", function(e) { e.preventDefault(); dropArea.classList.add("hover"); });
-    dropArea.addEventListener("dragleave", function(e) { dropArea.classList.remove("hover"); });
-    dropArea.addEventListener("drop", function(e) { e.preventDefault(); dropArea.classList.remove("hover"); let file = e.dataTransfer.files[0]; if(file) { handleFile(file); } });
-    dropArea.addEventListener("click", function() { document.getElementById("fileInput").click(); });
-    document.getElementById("returnBtn").addEventListener("click", function() {
-      if (compassAnimationId) { cancelAnimationFrame(compassAnimationId); compassAnimationId = null; }
-      document.getElementById("panorama").innerHTML = "";
-      document.getElementById("viewer").style.display = "none";
-      document.getElementById("home").style.display = "flex";
-      document.getElementById("fileInput").value = "";
+
+    function setMessage(text, isError = false) {
+      messageEl.textContent = text || "";
+      messageEl.style.color = isError ? "#ffd2d2" : "#ffffff";
+    }
+
+    function cleanupViewer() {
+      stopCompass();
+
+      if (myViewer && typeof myViewer.destroy === "function") {
+        try {
+          myViewer.destroy();
+        } catch (e) {
+          console.warn("销毁 viewer 时出现问题：", e);
+        }
+      }
       myViewer = null;
-      vantaEffect = VANTA.WAVES({ el: "#home", mouseControls: true, touchControls: true, minHeight: 200, minWidth: 200, scale: 1.0, scaleMobile: 1.0, color: 0x1e90ff, waveHeight: 20, shininess: 50 });
+
+      if (currentImageUrl) {
+        URL.revokeObjectURL(currentImageUrl);
+        currentImageUrl = null;
+      }
+
+      panoramaEl.innerHTML = "";
+      displayedAngle = 0;
+      compassArrowEl.style.transform = "rotate(0deg)";
+    }
+
+    function showHome() {
+      viewerEl.style.display = "none";
+      homeEl.style.display = "flex";
+      fileInputEl.value = "";
+      initVanta();
+    }
+
+    function showViewer() {
+      destroyVanta();
+      homeEl.style.display = "none";
+      viewerEl.style.display = "block";
+    }
+
+    function validateFile(file) {
+      if (!file) {
+        setMessage("未选择文件。", true);
+        return false;
+      }
+
+      const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+      const fileName = (file.name || "").toLowerCase();
+      const hasAllowedExt = /\.(jpg|jpeg|png|webp)$/.test(fileName);
+      const hasAllowedType = allowedTypes.includes(file.type);
+
+      if (!hasAllowedType && !hasAllowedExt) {
+        setMessage("请上传 JPG、PNG 或 WebP 格式图片。", true);
+        return false;
+      }
+
+      if (file.size > 100 * 1024 * 1024) {
+        setMessage("图片过大，请尽量选择 100MB 以内的图片。", true);
+        return false;
+      }
+
+      return true;
+    }
+
+    function handleFile(file) {
+      setMessage("");
+
+      if (!validateFile(file)) return;
+
+      const testUrl = URL.createObjectURL(file);
+      const img = new Image();
+
+      img.onload = function () {
+        const width = img.naturalWidth || img.width;
+        const height = img.naturalHeight || img.height;
+        const ratio = width / height;
+
+        currentImageUrl = testUrl;
+
+        showViewer();
+        cleanupViewer();
+
+        // cleanupViewer 会把 currentImageUrl 清掉，所以这里重新赋值
+        currentImageUrl = testUrl;
+
+        try {
+          myViewer = pannellum.viewer("panorama", {
+            type: "equirectangular",
+            panorama: currentImageUrl,
+            autoLoad: true,
+            compass: false,
+            driftEnabled: false,
+            showZoomCtrl: true,
+            showFullscreenCtrl: true
+          });
+
+          displayedAngle = 0;
+          updateCompass();
+
+          if (ratio < 1.8 || ratio > 2.2) {
+            setMessage(
+              `提示：图片尺寸为 ${width} × ${height}，宽高比约 ${ratio.toFixed(2)}，可能不是标准 2:1 全景图，显示可能会有拉伸。`
+            );
+          } else {
+            setMessage(`已加载图片：${width} × ${height}`);
+          }
+        } catch (err) {
+          console.error(err);
+          cleanupViewer();
+          showHome();
+          setMessage("全景图加载失败，请尝试更换一张 JPG/PNG/WebP 图片。", true);
+        }
+      };
+
+      img.onerror = function () {
+        URL.revokeObjectURL(testUrl);
+        setMessage("图片无法被浏览器正常解码，请尝试更换 JPG/PNG/WebP 图片。", true);
+      };
+
+      img.src = testUrl;
+    }
+
+    fileInputEl.addEventListener("change", function(event) {
+      const file = event.target.files && event.target.files[0];
+      if (file) handleFile(file);
     });
+
+    dropAreaEl.addEventListener("dragover", function(e) {
+      e.preventDefault();
+      dropAreaEl.classList.add("hover");
+    });
+
+    dropAreaEl.addEventListener("dragleave", function() {
+      dropAreaEl.classList.remove("hover");
+    });
+
+    dropAreaEl.addEventListener("drop", function(e) {
+      e.preventDefault();
+      dropAreaEl.classList.remove("hover");
+      const file = e.dataTransfer.files && e.dataTransfer.files[0];
+      if (file) handleFile(file);
+    });
+
+    dropAreaEl.addEventListener("click", function() {
+      fileInputEl.click();
+    });
+
+    document.getElementById("returnBtn").addEventListener("click", function() {
+      cleanupViewer();
+      showHome();
+      setMessage("");
+    });
+
     document.getElementById("helpButton").addEventListener("click", function() {
-      let helpModal = document.getElementById("helpModal");
-      helpModal.style.display = "block";
-      helpModal.classList.remove("active", "closing");
-      void helpModal.offsetWidth;
-      helpModal.classList.add("active");
+      helpModalEl.style.display = "block";
+      helpModalEl.classList.remove("active", "closing");
+      void helpModalEl.offsetWidth;
+      helpModalEl.classList.add("active");
     });
+
     document.getElementById("helpClose").addEventListener("click", function() {
-      let helpModal = document.getElementById("helpModal");
-      helpModal.classList.add("closing");
-      helpModal.addEventListener("animationend", function() { helpModal.classList.remove("active", "closing"); helpModal.style.display = "none"; }, {once: true});
+      helpModalEl.classList.add("closing");
+      helpModalEl.addEventListener("animationend", function() {
+        helpModalEl.classList.remove("active", "closing");
+        helpModalEl.style.display = "none";
+      }, { once: true });
     });
+
+    window.addEventListener("beforeunload", function() {
+      cleanupViewer();
+      destroyVanta();
+    });
+
+    initVanta();
   </script>
 </body>
 </html>
