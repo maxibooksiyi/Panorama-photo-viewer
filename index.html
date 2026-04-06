@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>全景照片浏览器</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <style>
     html, body {
       margin: 0;
@@ -450,7 +450,7 @@
     <p>
       1. 点击上传区域或直接拖拽图片到页面中。<br><br>
       2. 上传成功后，可通过鼠标拖动或手指滑动旋转视角。<br><br>
-      3. 使用鼠标滚轮或双指缩放可调整视野。<br><br>
+      3. 电脑端可使用鼠标滚轮缩放，手机端可双指捏合缩放。<br><br>
       4. 右下角指南针会跟随当前视角转动。<br><br>
       5. 点击右上角“返回首页”可退出浏览模式。<br><br>
       6. 推荐使用标准 2:1 equirectangular 全景图，以获得最佳效果。<br><br>
@@ -481,6 +481,10 @@
     let pointerDownY = 0;
     let pointerDownLon = 0;
     let pointerDownLat = 0;
+
+    let isPinching = false;
+    let pinchStartDistance = 0;
+    let pinchStartFov = 75;
 
     let currentImageUrl = null;
     let currentImageName = "";
@@ -554,6 +558,12 @@
       return true;
     }
 
+    function getTouchDistance(touch1, touch2) {
+      const dx = touch1.clientX - touch2.clientX;
+      const dy = touch1.clientY - touch2.clientY;
+      return Math.sqrt(dx * dx + dy * dy);
+    }
+
     function destroyViewer() {
       if (animationId) {
         cancelAnimationFrame(animationId);
@@ -566,10 +576,10 @@
       threeContainerEl.removeEventListener("mouseup", onPointerUp);
       threeContainerEl.removeEventListener("mouseleave", onPointerUp);
       threeContainerEl.removeEventListener("wheel", onMouseWheel);
-
       threeContainerEl.removeEventListener("touchstart", onTouchStart);
       threeContainerEl.removeEventListener("touchmove", onTouchMove);
       threeContainerEl.removeEventListener("touchend", onTouchEnd);
+      threeContainerEl.removeEventListener("touchcancel", onTouchEnd);
 
       if (sphereMesh) {
         if (sphereMesh.geometry) sphereMesh.geometry.dispose();
@@ -592,6 +602,11 @@
 
       scene = null;
       camera = null;
+
+      isUserInteracting = false;
+      isPinching = false;
+      pinchStartDistance = 0;
+      pinchStartFov = 75;
 
       if (currentImageUrl) {
         URL.revokeObjectURL(currentImageUrl);
@@ -663,7 +678,8 @@
 
       threeContainerEl.addEventListener("touchstart", onTouchStart, { passive: false });
       threeContainerEl.addEventListener("touchmove", onTouchMove, { passive: false });
-      threeContainerEl.addEventListener("touchend", onTouchEnd);
+      threeContainerEl.addEventListener("touchend", onTouchEnd, { passive: false });
+      threeContainerEl.addEventListener("touchcancel", onTouchEnd, { passive: false });
     }
 
     function onWindowResize() {
@@ -696,26 +712,65 @@
     }
 
     function onTouchStart(event) {
+      if (!camera) return;
+
       if (event.touches.length === 1) {
         event.preventDefault();
+        isPinching = false;
         isUserInteracting = true;
+
+        pointerDownX = event.touches[0].clientX;
+        pointerDownY = event.touches[0].clientY;
+        pointerDownLon = lon;
+        pointerDownLat = lat;
+      } else if (event.touches.length === 2) {
+        event.preventDefault();
+        isUserInteracting = false;
+        isPinching = true;
+
+        pinchStartDistance = getTouchDistance(event.touches[0], event.touches[1]);
+        pinchStartFov = camera.fov;
+      }
+    }
+
+    function onTouchMove(event) {
+      if (!camera) return;
+
+      if (event.touches.length === 1 && isUserInteracting) {
+        event.preventDefault();
+
+        lon = (pointerDownX - event.touches[0].clientX) * 0.12 + pointerDownLon;
+        lat = (event.touches[0].clientY - pointerDownY) * 0.12 + pointerDownLat;
+      } else if (event.touches.length === 2 && isPinching) {
+        event.preventDefault();
+
+        const currentDistance = getTouchDistance(event.touches[0], event.touches[1]);
+
+        if (pinchStartDistance > 0 && currentDistance > 0) {
+          const scale = pinchStartDistance / currentDistance;
+          camera.fov = pinchStartFov * scale;
+          camera.fov = Math.max(30, Math.min(100, camera.fov));
+          camera.updateProjectionMatrix();
+        }
+      }
+    }
+
+    function onTouchEnd(event) {
+      if (!camera) return;
+
+      if (event.touches.length === 0) {
+        isUserInteracting = false;
+        isPinching = false;
+        pinchStartDistance = 0;
+      } else if (event.touches.length === 1) {
+        isPinching = false;
+        isUserInteracting = true;
+
         pointerDownX = event.touches[0].clientX;
         pointerDownY = event.touches[0].clientY;
         pointerDownLon = lon;
         pointerDownLat = lat;
       }
-    }
-
-    function onTouchMove(event) {
-      if (event.touches.length === 1 && isUserInteracting) {
-        event.preventDefault();
-        lon = (pointerDownX - event.touches[0].clientX) * 0.12 + pointerDownLon;
-        lat = (event.touches[0].clientY - pointerDownY) * 0.12 + pointerDownLat;
-      }
-    }
-
-    function onTouchEnd() {
-      isUserInteracting = false;
     }
 
     function onMouseWheel(event) {
